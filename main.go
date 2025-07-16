@@ -1,29 +1,43 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
 
 	"github.com/clementine-tw/go-gator/internal/config"
 )
 
 func main() {
+	// read config
 	cfg, err := config.Read()
 	if err != nil {
-		fmt.Printf("error reading config file: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("error reading config file: %v", err)
 	}
 
-	err = cfg.SetUser("Clement")
-	if err != nil {
-		fmt.Printf("error setting current user name: %v\n", err)
-		os.Exit(1)
+	// initialize state
+	curState := &state{
+		cfg: &cfg,
 	}
 
-	cfg, err = config.Read()
-	if err != nil {
-		fmt.Printf("error reading config file: %v\n", err)
-		os.Exit(1)
+	// register commands
+	registeredCommands := commands{
+		Handlers: make(map[string]func(*state, command) error),
 	}
-	fmt.Printf("config file: %v\n", cfg)
+	err = registeredCommands.register("login", handlerLogin)
+	if err != nil {
+		log.Fatalf("error registering command: %v", err)
+	}
+
+	if len(os.Args) < 2 {
+		log.Fatal("Usage: cli <command> [args...]")
+	}
+	input := os.Args[1:]
+	cmd := command{
+		Name: input[0],
+		Args: input[1:],
+	}
+	err = registeredCommands.run(curState, cmd)
+	if err != nil {
+		log.Fatalf("error running command: %v", err)
+	}
 }
