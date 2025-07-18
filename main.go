@@ -35,6 +35,7 @@ func main() {
 		"login":    handlerLogin,
 		"register": handlerRegister,
 		"reset":    handlerReset,
+		"users":    handlerUsers,
 	}
 	cmds := commands{
 		Handlers: make(map[string]func(*state, command) error),
