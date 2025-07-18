@@ -31,20 +31,20 @@ func main() {
 	}
 
 	// register commands
-	registeredCommands := commands{
+	toRegCmds := map[string]func(*state, command) error{
+		"login":    handlerLogin,
+		"register": handlerRegister,
+		"reset":    handlerReset,
+	}
+	cmds := commands{
 		Handlers: make(map[string]func(*state, command) error),
 	}
-	err = registeredCommands.register("login", handlerLogin)
-	if err != nil {
-		log.Fatalf("error registering command: %v", err)
-	}
-	err = registeredCommands.register("register", handlerRegister)
-	if err != nil {
-		log.Fatalf("error registering command: %v", err)
-	}
-	err = registeredCommands.register("reset", handlerReset)
-	if err != nil {
-		log.Fatalf("error registering command: %v", err)
+	for name, handler := range toRegCmds {
+
+		err = cmds.register(name, handler)
+		if err != nil {
+			log.Fatalf("error registering command: %v", err)
+		}
 	}
 
 	if len(os.Args) < 2 {
@@ -55,7 +55,7 @@ func main() {
 		Name: input[0],
 		Args: input[1:],
 	}
-	err = registeredCommands.run(curState, cmd)
+	err = cmds.run(curState, cmd)
 	if err != nil {
 		log.Fatalf("error running command '%v': %v", cmd.Name, err)
 	}
