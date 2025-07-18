@@ -2,9 +2,7 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/clementine-tw/go-gator/internal/database"
@@ -14,7 +12,7 @@ import (
 func handlerRegister(s *state, c command) error {
 
 	if len(c.Args) == 0 {
-		return errors.New("the register handler expects a single argument, the username")
+		return fmt.Errorf("usage: %s <user_name>", c.Name)
 	}
 	username := c.Args[0]
 
@@ -29,37 +27,39 @@ func handlerRegister(s *state, c command) error {
 		})
 
 	if err != nil {
-		return fmt.Errorf("error inserting user to db: %w", err)
+		return fmt.Errorf("couldn't create user: %w", err)
 	}
 
 	err = s.cfg.SetUser(user.Name)
 	if err != nil {
-		return err
+		return fmt.Errorf("couldn't set current user: %w", err)
 	}
 
-	log.Printf("successfully register user: %v", user)
+	fmt.Println("User created successfully:")
+	fmt.Printf("Name: %s\n", user.Name)
+	fmt.Printf("ID: %s\n", user.ID)
 	return nil
 }
 
 func handlerLogin(s *state, c command) error {
 
 	if len(c.Args) == 0 {
-		return errors.New("the login handler expects a single argument, the username")
+		return fmt.Errorf("usage: %s <user_name>", c.Name)
 	}
 
 	username := c.Args[0]
 
 	user, err := s.db.GetUser(context.Background(), username)
 	if err != nil {
-		return err
+		return fmt.Errorf("couldn't find user: %w", err)
 	}
 
 	err = s.cfg.SetUser(user.Name)
 	if err != nil {
-		return fmt.Errorf("error setting user name when login: %w", err)
+		return fmt.Errorf("couldn't set current user: %w", err)
 	}
 
-	fmt.Printf("%s has been set\n", username)
+	fmt.Printf("Login successfully, current user: %s\n", username)
 
 	return nil
 }
