@@ -42,6 +42,10 @@ func main() {
 	if err != nil {
 		log.Fatalf("error registering command: %v", err)
 	}
+	err = registeredCommands.register("reset", handlerReset)
+	if err != nil {
+		log.Fatalf("error registering command: %v", err)
+	}
 
 	if len(os.Args) < 2 {
 		log.Fatal("Usage: cli <command> [args...]")
