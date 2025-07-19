@@ -37,6 +37,7 @@ func main() {
 		"reset":    handlerReset,
 		"users":    handlerUsers,
 		"agg":      handlerAggregate,
+		"addfeed":  handlerAddFeed,
 	}
 	cmds := commands{
 		Handlers: make(map[string]func(*state, command) error),
