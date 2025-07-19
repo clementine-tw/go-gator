@@ -49,3 +49,17 @@ func handlerAddFeed(s *state, c command) error {
 
 	return nil
 }
+
+func handlerFeeds(s *state, _ command) error {
+
+	feeds, err := s.db.GetFeedsWithUserName(context.Background())
+	if err != nil {
+		return fmt.Errorf("couldn't get feeds: %w", err)
+	}
+
+	fmt.Println("Feeds:\n-")
+	for _, feed := range feeds {
+		fmt.Printf("name: %s\nurl: %s\nuser: %s\n-\n", feed.Name, feed.Url, feed.UserName)
+	}
+	return nil
+}
