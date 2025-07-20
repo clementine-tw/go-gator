@@ -41,6 +41,7 @@ func main() {
 		"feeds":     handlerFeeds,
 		"follow":    middlewareLoggedIn(handlerFollowFeed),
 		"following": middlewareLoggedIn(handlerListFeedFollows),
+		"unfollow":  middlewareLoggedIn(handlerUnfollowFeed),
 	}
 	cmds := commands{
 		Handlers: make(map[string]func(*state, command) error),
