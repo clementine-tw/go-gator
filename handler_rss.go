@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/clementine-tw/go-gator/internal/database"
@@ -55,7 +57,35 @@ func scrapeFeed(db *database.Queries, feed database.Feed) {
 	}
 
 	for _, item := range content.Channel.Item {
-		log.Printf("Found post: %s\n", item.Title)
+		pubDate := sql.NullTime{}
+		if t, err := time.Parse(time.RFC1123Z, item.PubDate); err == nil {
+			pubDate = sql.NullTime{
+				Time:  t,
+				Valid: true,
+			}
+		}
+
+		_, err = db.CreatePost(
+			context.Background(),
+			database.CreatePostParams{
+				Title: item.Title,
+				Url:   item.Link,
+				Description: sql.NullString{
+					String: item.Description,
+					Valid:  true,
+				},
+				PublishedAt: pubDate,
+				FeedID:      feed.ID,
+			},
+		)
+		if err != nil {
+			if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+				continue
+			}
+
+			log.Printf("couldn't create post: %v", err)
+			continue
+		}
 	}
 
 	log.Printf("Feed %s collected, %v posts found", feed.Name, len(content.Channel.Item))
