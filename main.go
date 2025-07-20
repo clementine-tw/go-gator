@@ -32,13 +32,15 @@ func main() {
 
 	// register commands
 	toRegCmds := map[string]func(*state, command) error{
-		"login":    handlerLogin,
-		"register": handlerRegister,
-		"reset":    handlerReset,
-		"users":    handlerUsers,
-		"agg":      handlerAggregate,
-		"addfeed":  handlerAddFeed,
-		"feeds":    handlerFeeds,
+		"login":     handlerLogin,
+		"register":  handlerRegister,
+		"reset":     handlerReset,
+		"users":     handlerUsers,
+		"agg":       handlerAggregate,
+		"addfeed":   handlerAddFeed,
+		"feeds":     handlerFeeds,
+		"follow":    handlerFollowFeed,
+		"following": handlerListFeedFollows,
 	}
 	cmds := commands{
 		Handlers: make(map[string]func(*state, command) error),
