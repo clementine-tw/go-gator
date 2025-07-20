@@ -7,7 +7,7 @@ import (
 	"github.com/clementine-tw/go-gator/internal/database"
 )
 
-func handlerFollowFeed(s *state, c command) error {
+func handlerFollowFeed(s *state, c command, user database.User) error {
 
 	if len(c.Args) == 0 {
 		return fmt.Errorf("usage: %s <feed_url>", c.Name)
@@ -20,14 +20,6 @@ func handlerFollowFeed(s *state, c command) error {
 	)
 	if err != nil {
 		return fmt.Errorf("couldn't find feed: %w", err)
-	}
-
-	user, err := s.db.GetUser(
-		context.Background(),
-		s.cfg.CurrentUserName,
-	)
-	if err != nil {
-		return fmt.Errorf("couldn't find user: %w", err)
 	}
 
 	record, err := s.db.CreateFeedFollow(
@@ -47,20 +39,15 @@ func handlerFollowFeed(s *state, c command) error {
 	return nil
 }
 
-func handlerListFeedFollows(s *state, _ command) error {
-
-	user, err := s.db.GetUser(
-		context.Background(),
-		s.cfg.CurrentUserName,
-	)
-	if err != nil {
-		return fmt.Errorf("couldn't find user: %w", err)
-	}
+func handlerListFeedFollows(s *state, _ command, user database.User) error {
 
 	feeds, err := s.db.GetFollowingFeedsByUserID(
 		context.Background(),
 		user.ID,
 	)
+	if err != nil {
+		return fmt.Errorf("couldn't get following feeds: %w", err)
+	}
 
 	if len(feeds) == 0 {
 		fmt.Println("No following feed")

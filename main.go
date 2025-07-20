@@ -37,10 +37,10 @@ func main() {
 		"reset":     handlerReset,
 		"users":     handlerUsers,
 		"agg":       handlerAggregate,
-		"addfeed":   handlerAddFeed,
+		"addfeed":   middlewareLoggedIn(handlerAddFeed),
 		"feeds":     handlerFeeds,
-		"follow":    handlerFollowFeed,
-		"following": handlerListFeedFollows,
+		"follow":    middlewareLoggedIn(handlerFollowFeed),
+		"following": middlewareLoggedIn(handlerListFeedFollows),
 	}
 	cmds := commands{
 		Handlers: make(map[string]func(*state, command) error),

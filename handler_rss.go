@@ -19,15 +19,10 @@ func handlerAggregate(_ *state, _ command) error {
 	return nil
 }
 
-func handlerAddFeed(s *state, c command) error {
+func handlerAddFeed(s *state, c command, user database.User) error {
 
 	if len(c.Args) < 2 {
 		return fmt.Errorf("usage: %s <feed_name> <feed_url>", c.Name)
-	}
-
-	user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
-	if err != nil {
-		return fmt.Errorf("couldn't get user: %w", err)
 	}
 
 	feedName := c.Args[0]
